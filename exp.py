@@ -83,11 +83,10 @@ class EXP(plugins.Plugin):
             self.bar="╷▄▄▄▄▄▄▄▄▄▄╷"
         ui.set('Lv', "%d" % self.lv)
         ui.set('Exp', "%s" % self.bar)
-        self.Save()
+        
         
     def exp_check(self):
         logging.info("EXP CHECK")
-        self.mainpoint=self.point+self.expgained
         if self.exp>=self.expneeded:
             self.lv=self.lv+1
             self.expneeded=int((100*(self.lv*self.lv*self.lv))/200)
@@ -97,30 +96,24 @@ class EXP(plugins.Plugin):
         self.expgained=self.exp+(1*self.mod)
         self.exp=self.expgained
         self.exp_check()
+        self.Save()
         
     def on_deauthentication(self, agent, access_point, client_station):
         self.expgained=self.exp+(2*self.mod)
         self.exp=self.expgained
         self.exp_check()
+        self.Save()
         
     def on_handshake(self, agent, filename, access_point, client_station):
         self.expgained=self.exp+(3*self.mod)
         self.exp=self.expgained
         self.exp_check()
+        self.Save()
         
     def on_ai_best_reward(self, agent, reward):
         self.expgained=self.exp+(5*self.mod)
         self.exp=self.expgained
         self.exp_check()
+        self.Save()
         
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-     
