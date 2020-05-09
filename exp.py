@@ -20,7 +20,7 @@ class EXP(plugins.Plugin):
         self.expgained=0
         self.exp=1
         self.lv=1
-        self.cwd = os.getcwd()
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
         self.cwd = self.cwd+"/exp.txt"
         logging.info(self.cwd)
         if os.path.exists("exp.txt"):
@@ -117,3 +117,13 @@ class EXP(plugins.Plugin):
         self.Save()
         
 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+     
