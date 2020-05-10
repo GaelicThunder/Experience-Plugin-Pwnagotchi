@@ -9,7 +9,7 @@ import pwnagotchi
 
 class EXP(plugins.Plugin):
     __author__ = 'GaelicThunder'
-    __version__ = '1.0.0'
+    __version__ = '1.0.1'
     __license__ = 'GPL3'
     __description__ = 'Get exp every time a handshake get captured.'
     
@@ -46,6 +46,7 @@ class EXP(plugins.Plugin):
         
    
     def Save(self):
+        logging.info('Saving Exp')
         outfile=open(self.cwd, 'w')
         print(self.exp,file=outfile)
         print(self.lv,file=outfile)
@@ -93,37 +94,22 @@ class EXP(plugins.Plugin):
 
         
     def on_association(self, agent, access_point):
-        self.expgained=self.exp+(1*self.mod)
-        self.exp=self.expgained
+        self.exp=self.exp+1
         self.exp_check()
         self.Save()
         
     def on_deauthentication(self, agent, access_point, client_station):
-        self.expgained=self.exp+(2*self.mod)
-        self.exp=self.expgained
+        self.exp=self.exp+2
         self.exp_check()
         self.Save()
         
     def on_handshake(self, agent, filename, access_point, client_station):
-        self.expgained=self.exp+(3*self.mod)
-        self.exp=self.expgained
+        self.exp=self.exp+3
         self.exp_check()
         self.Save()
         
     def on_ai_best_reward(self, agent, reward):
-        self.expgained=self.exp+(5*self.mod)
-        self.exp=self.expgained
+        self.exp=self.exp+5
         self.exp_check()
         self.Save()
         
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-     
