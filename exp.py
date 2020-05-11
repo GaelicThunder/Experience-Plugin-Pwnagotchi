@@ -9,7 +9,7 @@ import pwnagotchi
 
 class EXP(plugins.Plugin):
     __author__ = 'GaelicThunder'
-    __version__ = '1.0.1'
+    __version__ = '1.0.2'
     __license__ = 'GPL3'
     __description__ = 'Get exp every time a handshake get captured.'
     
@@ -89,6 +89,7 @@ class EXP(plugins.Plugin):
     def exp_check(self):
         logging.info("EXP CHECK")
         if self.exp>=self.expneeded:
+            self.exp=1
             self.lv=self.lv+1
             self.expneeded=int((100*(self.lv*self.lv*self.lv))/200)
 
