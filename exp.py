@@ -9,7 +9,7 @@ import pwnagotchi
 
 class EXP(plugins.Plugin):
     __author__ = 'GaelicThunder'
-    __version__ = '1.0.2'
+    __version__ = '1.0.3'
     __license__ = 'GPL3'
     __description__ = 'Get exp every time a handshake get captured.'
     
@@ -23,7 +23,7 @@ class EXP(plugins.Plugin):
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         self.cwd = self.cwd+"/exp.txt"
         logging.info(self.cwd)
-        if os.path.exists("exp.txt"):
+        if os.path.exists(self.cwd):
             outfile= open(self.cwd, 'r+')
             self.exp = int(outfile.readline())
             self.lv = int(outfile.readline())
