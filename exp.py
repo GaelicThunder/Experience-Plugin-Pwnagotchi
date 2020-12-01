@@ -10,6 +10,13 @@ import pwnagotchi.ui.fonts as fonts
 from pwnagotchi.ui.components import LabeledValue
 from pwnagotchi.ui.view import BLACK
 
+#Static Variables
+MULTIPLIER_ASSOCIATION = 1
+MULTIPLIER_DEAUTH = 2
+MULTIPLIER_HANDSHAKE = 3
+MULTIPLIER_AI_BEST_REWARD = 5
+TAG = "[EXP Plugin]"
+FACELEVELUP='(≧◡◡≦)'
 
 class EXP(plugins.Plugin):
     __author__ = 'GaelicThunder'
@@ -17,21 +24,13 @@ class EXP(plugins.Plugin):
     __license__ = 'GPL3'
     __description__ = 'Get exp every time a handshake get captured.'
 
-    #move outside
-    MULTIPLIER_ASSOCIATION = 1
-    MULTIPLIER_DEAUTH = 2
-    MULTIPLIER_HANDSHAKE = 3
-    MULTIPLIER_AI_BEST_REWARD = 5
-    TAG = "[EXP Plugin]"
-    FACELEVELUP='(≧◡◡≦)'
-
     #Attention number masking
     def LogInfo(self, text):
-        logging.info(self.TAG + " " +text)
+        logging.info(TAG + " " +text)
     
     #Attention number masking
     def LogDebug(self, text):
-        logging.debug(self.TAG + " " +text)
+        logging.debug(TAG + " " +text)
     
     
     def __init__(self):
@@ -157,9 +156,9 @@ class EXP(plugins.Plugin):
                 associations += data["data"][entry]["num_associations"]
             
 
-        sum += deauths * self.MULTIPLIER_DEAUTH
-        sum += handshakes * self.MULTIPLIER_HANDSHAKE
-        sum += associations * self.MULTIPLIER_ASSOCIATION
+        sum += deauths * MULTIPLIER_DEAUTH
+        sum += handshakes * MULTIPLIER_HANDSHAKE
+        sum += associations * MULTIPLIER_ASSOCIATION
 
         return sum
 
@@ -194,9 +193,9 @@ class EXP(plugins.Plugin):
     #Get Last Sessions Points
     def lastSessionPoints(self, agent):
         summary = 0
-        summary += agent.LastSession.handshakes * self.MULTIPLIER_HANDSHAKE
-        summary += agent.LastSession.associated * self.MULTIPLIER_ASSOCIATION
-        summary += agent.LastSession.deauthed * self.MULTIPLIER_DEAUTH
+        summary += agent.LastSession.handshakes * MULTIPLIER_HANDSHAKE
+        summary += agent.LastSession.associated * MULTIPLIER_ASSOCIATION
+        summary += agent.LastSession.deauthed * MULTIPLIER_DEAUTH
         return summary
 
     
@@ -216,28 +215,28 @@ class EXP(plugins.Plugin):
     
     def displayLevelUp(self, agent):
         view =  agent.view()
-        view.set('face', self.FACELEVELUP)
+        view.set('face', FACELEVELUP)
         view.set('status', "Level Up!")
         view.update(force=True)
 
     #Event Handling
     def on_association(self, agent, access_point):
-        self.exp += self.MULTIPLIER_ASSOCIATION
+        self.exp += MULTIPLIER_ASSOCIATION
         self.exp_check(agent)
         self.Save()
         
     def on_deauthentication(self, agent, access_point, client_station):
-        self.exp += self.MULTIPLIER_DEAUTH
+        self.exp += MULTIPLIER_DEAUTH
         self.exp_check(agent)
         self.Save()
         
     def on_handshake(self, agent, filename, access_point, client_station):
-        self.exp += self.MULTIPLIER_HANDSHAKE
+        self.exp += MULTIPLIER_HANDSHAKE
         self.exp_check(agent)
         self.Save()
         
     def on_ai_best_reward(self, agent, reward):
-        self.exp += self.MULTIPLIER_AI_BEST_REWARD
+        self.exp += MULTIPLIER_AI_BEST_REWARD
         self.exp_check(agent)
         self.Save()
 
