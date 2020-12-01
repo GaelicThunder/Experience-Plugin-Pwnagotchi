@@ -17,11 +17,13 @@ class EXP(plugins.Plugin):
     __license__ = 'GPL3'
     __description__ = 'Get exp every time a handshake get captured.'
 
+    #move outside
     MULTIPLIER_ASSOCIATION = 1
     MULTIPLIER_DEAUTH = 2
     MULTIPLIER_HANDSHAKE = 3
     MULTIPLIER_AI_BEST_REWARD = 5
     TAG = "[EXP Plugin]"
+    FACELEVELUP='(≧◡◡≦)'
 
     #Attention number masking
     def LogInfo(self, text):
@@ -125,17 +127,13 @@ class EXP(plugins.Plugin):
             self.exp=1
             self.lv=self.lv+1
             self.expneeded=self.calcExpNeeded(self.lv)
-            #TODO: do propery
-            #get Excited ;-)
-            agent.set_excited()
+            self.displayLevelUp(agent)
 
     def parseSessionStats(self):
         sum = 0
         dir = pwnagotchi.config['main']['plugins']['session-stats']['save_directory']
         #TODO: remove
-        #dir="/var/tmp/test1"
         self.LogInfo("Session-Stats dir: " + dir)
-        #TODO: Write Code here
         for filename in os.listdir(dir):
             self.LogInfo("Parsing " + filename + "...")
             if filename.endswith(".json") & filename.startswith("stats"):
@@ -213,9 +211,14 @@ class EXP(plugins.Plugin):
         self.exp = sum1
         self.expneeded = self.calcExpNeeded(level) - sum1
         if level > 1:
-            #TODO: do propery
             #get Excited ;-)
-            agent.set_excited()
+            self.displayLevelUp(agent)
+    
+    def displayLevelUp(self, agent):
+        view =  agent.view()
+        view.set('face', self.FACELEVELUP)
+        view.set('status', "Level Up!")
+        view.update(force=True)
 
     #Event Handling
     def on_association(self, agent, access_point):
