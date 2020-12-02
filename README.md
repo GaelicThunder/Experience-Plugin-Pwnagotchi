@@ -6,6 +6,8 @@ Wanted to make him more like a Tamagotchi, but moved that idea on another projec
 
 Im a total newb when it comes to Python so, feel free to help if you see im doing som ebad stuff or you got some interesting ideas
 
+Thanks to @mbudget0x01 for all the cool stuff!
+
 ## Things to do
   
 - [x] Better Save System -> Saves are now in json Format and will per default migrate.
