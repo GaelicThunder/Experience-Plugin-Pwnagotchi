@@ -16,8 +16,12 @@ MULTIPLIER_DEAUTH = 2
 MULTIPLIER_HANDSHAKE = 3
 MULTIPLIER_AI_BEST_REWARD = 5
 TAG = "[EXP Plugin]"
-FACE_LEVELUP='(≧◡◡≦)'
-BAR_ERROR="╷   error  ╷"
+FACE_LEVELUP = '(≧◡◡≦)'
+BAR_ERROR = "╷   error  ╷"
+FILE_SAVE = "exp_stats"
+FILE_SAVE_LEGACY = "exp"
+JSON_KEY_LEVEL = "level"
+JSON_KEY_EXP ="exp"
 
 class EXP(plugins.Plugin):
     __author__ = 'GaelicThunder'
@@ -36,47 +40,47 @@ class EXP(plugins.Plugin):
     
     def __init__(self):
         self.percent=0
-        #never used
-        #self.expgained=0
         self.calculateInitialXP = False
         self.exp=1
         self.lv=1
-        self.save_file_mode = self.save_file_modes("txt")
-        self.cwd = os.path.dirname(os.path.realpath(__file__))
-        self.cwd = self.cwd+"/exp.txt"
-        logging.info(self.cwd)
+        #sets the file type I recomend json
+        self.save_file_mode = self.save_file_modes("json")
+        self.save_file = self.getSaveFileName(self.save_file_mode)
+        #migrate from old save system
+        self.migrateLegacySave()
 
-        #TODO: rework
-        if os.path.exists(self.cwd):
-            self.loadFromTxtFile(self.cwd)
+        #create save file
+        if not os.path.exists(self.save_file):
+            self.Save(self.save_file, self.save_file_mode)
         else:
-            self.saveToTxtFile(self.cwd)
-        
+            self.Load(self.save_file, self.save_file_mode)
+
+        #no previos data, try get it
         if self.exp == 1:
             self.calculateInitialXP = True
             
-        #This is a different value
-        #self.expneeded=int((100*(self.lv**3))/5)
         self.expneeded = self.calcExpNeeded(self.lv)
         
     def on_loaded(self):
         #logging.info("Exp plugin loaded for %s" % self.options['device'])
         self.LogInfo("Plugin Loaded")
         
-   def save_file_modes(self,argument): 
-    switcher = { 
-        "txt": 0, 
-        "json": 1,  
-    }
-    return switcher.get(argument, 0) 
+    def save_file_modes(self,argument): 
+        switcher = { 
+            "txt": 0, 
+            "json": 1,  
+        }
+        return switcher.get(argument, 0) 
 
-    def Save(self, save_file_mode):
+    def Save(self, file, save_file_mode):
         self.LogDebug('Saving Exp')
         if save_file_mode == 0:
-            self.saveToTxtFile(self.cwd)
+            self.saveToTxtFile(file)
+        if save_file_mode == 1:
+            self.saveToJsonFile(file)
 
     def saveToTxtFile(self, file):
-        outfile=open(self.cwd, 'w')
+        outfile=open(file, 'w')
         print(self.exp,file=outfile)
         print(self.lv,file=outfile)
         outfile.close()
@@ -87,8 +91,55 @@ class EXP(plugins.Plugin):
             self.exp = int(outfile.readline())
             self.lv = int(outfile.readline())
             outfile.close()
+    
+    def saveToJsonFile(self,file):
+        data = {
+            JSON_KEY_LEVEL : self.lv,
+            JSON_KEY_EXP : self.exp
+        }
 
-  
+        with open(file, 'w') as f:
+            f.write(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
+
+    def loadFromJsonFile(self, file):
+        data = {}
+        with open(file, 'r') as f:
+            data = json.loads(f.read())
+        
+        if bool(data):
+            self.lv = data[JSON_KEY_LEVEL]
+            self.exp = data[JSON_KEY_EXP]
+        else:
+            self.LogInfo("Empty json")
+    
+    #TODO: one day change save file mode to file date
+    def Load(self, file, save_file_mode):
+        self.LogDebug('Loading Exp')
+        if save_file_mode == 0:
+            self.loadFromTxtFile(file)
+        if save_file_mode == 1:
+            self.loadFromJsonFile(file)
+    
+    def getSaveFileName(self, save_file_mode):
+        file = os.path.dirname(os.path.realpath(__file__))
+        file = file + "/" +FILE_SAVE
+        if save_file_mode == 0:
+            file = file + ".txt"
+        elif save_file_mode == 1:
+            file = file + ".json"
+        else:
+            #see switcher
+            file = file + ".txt"
+        return file
+    
+    def migrateLegacySave(self):
+        legacyFile = os.path.dirname(os.path.realpath(__file__))
+        legacyFile = legacyFile + "/" + FILE_SAVE_LEGACY +".txt"
+        if os.path.exists(legacyFile):
+            self.loadFromTxtFile(legacyFile)
+            self.LogInfo("Migrating Legacy Save...")
+            self.Save(self.save_file, self.save_file_mode)
+            os.remove(legacyFile)
     
     def on_ui_setup(self, ui):
         ui.add_element('Lv', LabeledValue(color=BLACK, label='Lv', value=0, position=(ui.width() / 2 - 125, 95),
@@ -236,27 +287,27 @@ class EXP(plugins.Plugin):
     def on_association(self, agent, access_point):
         self.exp += MULTIPLIER_ASSOCIATION
         self.exp_check(agent)
-        self.Save(self.save_file_mode)
+        self.Save(self.save_file, self.save_file_mode)
         
     def on_deauthentication(self, agent, access_point, client_station):
         self.exp += MULTIPLIER_DEAUTH
         self.exp_check(agent)
-        self.Save(self.save_file_mode)
+        self.Save(self.save_file, self.save_file_mode)
         
     def on_handshake(self, agent, filename, access_point, client_station):
         self.exp += MULTIPLIER_HANDSHAKE
         self.exp_check(agent)
-        self.Save(self.save_file_mode)
+        self.Save(self.save_file, self.save_file_mode)
         
     def on_ai_best_reward(self, agent, reward):
         self.exp += MULTIPLIER_AI_BEST_REWARD
         self.exp_check(agent)
-        self.Save(self.save_file_mode)
+        self.Save(self.save_file, self.save_file_mode)
 
     def on_ready(self, agent):
         if self.calculateInitialXP:
             self.LogInfo("Initial point calculation")
             sum = self.calculateInitialSum(agent)
             self.calcLevelFromSum(sum, agent)
-            self.Save(self.save_file_mode)
+            self.Save(self.save_file, self.save_file_mode)
                 
