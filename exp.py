@@ -41,23 +41,16 @@ class EXP(plugins.Plugin):
         self.calculateInitialXP = False
         self.exp=1
         self.lv=1
+        self.save_file_mode = self.save_file_modes("txt")
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         self.cwd = self.cwd+"/exp.txt"
         logging.info(self.cwd)
 
         #TODO: rework
         if os.path.exists(self.cwd):
-            self.LogDebug("file exists")
-            outfile= open(self.cwd, 'r+')
-            self.exp = int(outfile.readline())
-            self.lv = int(outfile.readline())
-            outfile.close()
+            self.loadFromTxtFile(self.cwd)
         else:
-            self.LogDebug("file createt")
-            outfile=open(self.cwd, 'w')
-            print(self.exp,file=outfile)
-            print(self.lv,file=outfile)
-            outfile.close()
+            self.saveToTxtFile(self.cwd)
         
         if self.exp == 1:
             self.calculateInitialXP = True
@@ -70,13 +63,31 @@ class EXP(plugins.Plugin):
         #logging.info("Exp plugin loaded for %s" % self.options['device'])
         self.LogInfo("Plugin Loaded")
         
-   
-    def Save(self):
+   def save_file_modes(self,argument): 
+    switcher = { 
+        "txt": 0, 
+        "json": 1,  
+    }
+    return switcher.get(argument, 0) 
+
+    def Save(self, save_file_mode):
         self.LogDebug('Saving Exp')
+        if save_file_mode == 0:
+            self.saveToTxtFile(self.cwd)
+
+    def saveToTxtFile(self, file):
         outfile=open(self.cwd, 'w')
         print(self.exp,file=outfile)
         print(self.lv,file=outfile)
         outfile.close()
+
+    def loadFromTxtFile(self, file):
+        if os.path.exists(file):
+            outfile= open(file, 'r+')
+            self.exp = int(outfile.readline())
+            self.lv = int(outfile.readline())
+            outfile.close()
+
   
     
     def on_ui_setup(self, ui):
@@ -225,27 +236,27 @@ class EXP(plugins.Plugin):
     def on_association(self, agent, access_point):
         self.exp += MULTIPLIER_ASSOCIATION
         self.exp_check(agent)
-        self.Save()
+        self.Save(self.save_file_mode)
         
     def on_deauthentication(self, agent, access_point, client_station):
         self.exp += MULTIPLIER_DEAUTH
         self.exp_check(agent)
-        self.Save()
+        self.Save(self.save_file_mode)
         
     def on_handshake(self, agent, filename, access_point, client_station):
         self.exp += MULTIPLIER_HANDSHAKE
         self.exp_check(agent)
-        self.Save()
+        self.Save(self.save_file_mode)
         
     def on_ai_best_reward(self, agent, reward):
         self.exp += MULTIPLIER_AI_BEST_REWARD
         self.exp_check(agent)
-        self.Save()
+        self.Save(self.save_file_mode)
 
     def on_ready(self, agent):
         if self.calculateInitialXP:
             self.LogInfo("Initial point calculation")
             sum = self.calculateInitialSum(agent)
             self.calcLevelFromSum(sum, agent)
-            self.Save()
+            self.Save(self.save_file_mode)
                 
