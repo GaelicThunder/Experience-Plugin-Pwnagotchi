@@ -22,6 +22,7 @@ FILE_SAVE = "exp_stats"
 FILE_SAVE_LEGACY = "exp"
 JSON_KEY_LEVEL = "level"
 JSON_KEY_EXP ="exp"
+JSON_KEY_EXP_TOT ="exp_tot"
 
 class EXP(plugins.Plugin):
     __author__ = 'GaelicThunder'
@@ -41,8 +42,9 @@ class EXP(plugins.Plugin):
     def __init__(self):
         self.percent=0
         self.calculateInitialXP = False
-        self.exp=1
+        self.exp=0
         self.lv=1
+        self.exp_tot=0
         #sets the file type I recomend json
         self.save_file_mode = self.save_file_modes("json")
         self.save_file = self.getSaveFileName(self.save_file_mode)
@@ -56,8 +58,12 @@ class EXP(plugins.Plugin):
             self.Load(self.save_file, self.save_file_mode)
 
         #no previos data, try get it
-        if self.exp == 1:
+        if self.lv == 1 and self.exp == 0:
             self.calculateInitialXP = True
+        if self.exp_tot == 0:
+            self.LogInfo("Need to calculate Total Exp")
+            self.exp_tot = self.calcActualSum(self.lv, self.exp)
+            self.Save(self.save_file, self.save_file_mode)
             
         self.expneeded = self.calcExpNeeded(self.lv)
         
@@ -83,25 +89,35 @@ class EXP(plugins.Plugin):
         outfile=open(file, 'w')
         print(self.exp,file=outfile)
         print(self.lv,file=outfile)
+        print(self.exp_tot,file=outfile)
         outfile.close()
 
     def loadFromTxtFile(self, file):
         if os.path.exists(file):
             outfile= open(file, 'r+')
-            self.exp = int(outfile.readline())
-            self.lv = int(outfile.readline())
+            lines = outfile.readlines()
+            linecounter = 1
+            for line in lines:
+                if linecounter == 1:
+                    self.exp = int(line)
+                elif linecounter == 2:
+                    self.lv == int(line)
+                elif linecounter == 3:
+                    self.exp_tot == int(line)
             outfile.close()
     
     def saveToJsonFile(self,file):
         data = {
             JSON_KEY_LEVEL : self.lv,
-            JSON_KEY_EXP : self.exp
+            JSON_KEY_EXP : self.exp,
+            JSON_KEY_EXP_TOT : self.exp_tot
         }
 
         with open(file, 'w') as f:
             f.write(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
 
     def loadFromJsonFile(self, file):
+        #tot exp is introduced with json, no check needed
         data = {}
         with open(file, 'r') as f:
             data = json.loads(f.read())
@@ -109,6 +125,7 @@ class EXP(plugins.Plugin):
         if bool(data):
             self.lv = data[JSON_KEY_LEVEL]
             self.exp = data[JSON_KEY_EXP]
+            self.exp_tot = data[JSON_KEY_EXP_TOT]
         else:
             self.LogInfo("Empty json")
     
@@ -179,7 +196,7 @@ class EXP(plugins.Plugin):
     def calcExpNeeded(self, level):
         #if the pwnagotchi is lvl <1 it causes the keys to be deleted
         if level == 1:
-            return 1
+            return 5
         return int((level**3)/2)
     
 
@@ -276,6 +293,15 @@ class EXP(plugins.Plugin):
         if level > 1:
             #get Excited ;-)
             self.displayLevelUp(agent)
+
+    def calcActualSum(self, level, exp):
+        lvlCounter = 1
+        sum = exp
+        # I know it wouldn't work if you change the lvl algorithm
+        while lvlCounter < level:
+            sum += self.calcExpNeeded(lvlCounter)
+            lvlCounter += 1
+        return sum
     
     def displayLevelUp(self, agent):
         view =  agent.view()
@@ -286,21 +312,25 @@ class EXP(plugins.Plugin):
     #Event Handling
     def on_association(self, agent, access_point):
         self.exp += MULTIPLIER_ASSOCIATION
+        self.exp_tot += MULTIPLIER_ASSOCIATION
         self.exp_check(agent)
         self.Save(self.save_file, self.save_file_mode)
         
     def on_deauthentication(self, agent, access_point, client_station):
         self.exp += MULTIPLIER_DEAUTH
+        self.exp_tot += MULTIPLIER_DEAUTH
         self.exp_check(agent)
         self.Save(self.save_file, self.save_file_mode)
         
     def on_handshake(self, agent, filename, access_point, client_station):
         self.exp += MULTIPLIER_HANDSHAKE
+        self.exp_tot += MULTIPLIER_HANDSHAKE
         self.exp_check(agent)
         self.Save(self.save_file, self.save_file_mode)
         
     def on_ai_best_reward(self, agent, reward):
         self.exp += MULTIPLIER_AI_BEST_REWARD
+        self.exp_tot += MULTIPLIER_AI_BEST_REWARD
         self.exp_check(agent)
         self.Save(self.save_file, self.save_file_mode)
 
@@ -308,6 +338,7 @@ class EXP(plugins.Plugin):
         if self.calculateInitialXP:
             self.LogInfo("Initial point calculation")
             sum = self.calculateInitialSum(agent)
+            self.exp_tot = sum
             self.calcLevelFromSum(sum, agent)
             self.Save(self.save_file, self.save_file_mode)
                 
