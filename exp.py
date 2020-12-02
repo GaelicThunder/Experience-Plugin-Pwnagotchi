@@ -16,7 +16,8 @@ MULTIPLIER_DEAUTH = 2
 MULTIPLIER_HANDSHAKE = 3
 MULTIPLIER_AI_BEST_REWARD = 5
 TAG = "[EXP Plugin]"
-FACELEVELUP='(≧◡◡≦)'
+FACE_LEVELUP='(≧◡◡≦)'
+BAR_ERROR="╷   error  ╷"
 
 class EXP(plugins.Plugin):
     __author__ = 'GaelicThunder'
@@ -35,7 +36,6 @@ class EXP(plugins.Plugin):
     
     def __init__(self):
         self.percent=0
-        self.bar=" "
         #never used
         #self.expgained=0
         self.calculateInitialXP = False
@@ -87,29 +87,31 @@ class EXP(plugins.Plugin):
     def on_ui_update(self, ui):
         self.expneeded=self.calcExpNeeded(self.lv)
         self.percent=int((self.exp/self.expneeded)*100)
-        self.bar="╷          ╷"     
+        bar="╷          ╷"   
         if self.percent<10:
-            self.bar="╷          ╷"
-        if self.percent>9 and self.percent<20:
-            self.bar="╷▄         ╷"
-        if self.percent>19 and self.percent<30:
-            self.bar="╷▄▄        ╷"
-        if self.percent>29 and self.percent<40:
-            self.bar="╷▄▄▄       ╷"
-        if self.percent>39 and self.percent<50:
-            self.bar="╷▄▄▄▄      ╷"
-        if self.percent>49 and self.percent<60:
-            self.bar="╷▄▄▄▄▄     ╷"
-        if self.percent>59 and self.percent<70:
-            self.bar="╷▄▄▄▄▄▄    ╷"
-        if self.percent>69 and self.percent<80:
-            self.bar="╷▄▄▄▄▄▄▄   ╷"
-        if self.percent>79 and self.percent<90:
-            self.bar="╷▄▄▄▄▄▄▄▄  ╷"
-        if self.percent>89 and self.percent<100:
-            self.bar="╷▄▄▄▄▄▄▄▄▄▄╷"
+            bar="╷          ╷"
+        if self.percent>=10 and self.percent<20:
+            bar="╷▄         ╷"
+        if self.percent>=20 and self.percent<30:
+            bar="╷▄▄        ╷"
+        if self.percent>=30 and self.percent<40:
+            bar="╷▄▄▄       ╷"
+        if self.percent>=40 and self.percent<50:
+            bar="╷▄▄▄▄      ╷"
+        if self.percent>=50 and self.percent<60:
+            bar="╷▄▄▄▄▄     ╷"
+        if self.percent>=60 and self.percent<70:
+            bar="╷▄▄▄▄▄▄    ╷"
+        if self.percent>=70 and self.percent<80:
+            bar="╷▄▄▄▄▄▄▄   ╷"
+        if self.percent>=80 and self.percent<90:
+            bar="╷▄▄▄▄▄▄▄▄  ╷"
+        if self.percent>=90 and self.percent<=100:
+            bar="╷▄▄▄▄▄▄▄▄▄▄╷"
+        if self.percent > 100:
+            bar = BAR_ERROR
         ui.set('Lv', "%d" % self.lv)
-        ui.set('Exp', "%s" % self.bar)
+        ui.set('Exp', "%s" % bar)
 
 
     def calcExpNeeded(self, level):
@@ -215,7 +217,7 @@ class EXP(plugins.Plugin):
     
     def displayLevelUp(self, agent):
         view =  agent.view()
-        view.set('face', FACELEVELUP)
+        view.set('face', FACE_LEVELUP)
         view.set('status', "Level Up!")
         view.update(force=True)
 
