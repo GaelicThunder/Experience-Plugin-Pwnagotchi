@@ -55,7 +55,12 @@ class EXP(plugins.Plugin):
         if not os.path.exists(self.save_file):
             self.Save(self.save_file, self.save_file_mode)
         else:
-            self.Load(self.save_file, self.save_file_mode)
+            try:
+                #Try loading
+                self.Load(self.save_file, self.save_file_mode)
+            except:
+                #Likely throws an exception if json file is corrupted so we need to calculate from scratch
+                self.calculateInitialXP = True
 
         #no previos data, try get it
         if self.lv == 1 and self.exp == 0:
