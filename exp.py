@@ -104,6 +104,7 @@ class EXP(plugins.Plugin):
                     self.lv == int(line)
                 elif linecounter == 3:
                     self.exp_tot == int(line)
+                linecounter += 1
             outfile.close()
     
     def saveToJsonFile(self,file):
