@@ -170,25 +170,25 @@ class EXP(plugins.Plugin):
         bar="╷          ╷"   
         if self.percent<10:
             bar="╷          ╷"
-        if self.percent>=10 and self.percent<20:
+        elif self.percent>=10 and self.percent<20:
             bar="╷▄         ╷"
-        if self.percent>=20 and self.percent<30:
+        elif self.percent>=20 and self.percent<30:
             bar="╷▄▄        ╷"
-        if self.percent>=30 and self.percent<40:
+        elif self.percent>=30 and self.percent<40:
             bar="╷▄▄▄       ╷"
-        if self.percent>=40 and self.percent<50:
+        elif self.percent>=40 and self.percent<50:
             bar="╷▄▄▄▄      ╷"
-        if self.percent>=50 and self.percent<60:
+        elif self.percent>=50 and self.percent<60:
             bar="╷▄▄▄▄▄     ╷"
-        if self.percent>=60 and self.percent<70:
+        elif self.percent>=60 and self.percent<70:
             bar="╷▄▄▄▄▄▄    ╷"
-        if self.percent>=70 and self.percent<80:
+        elif self.percent>=70 and self.percent<80:
             bar="╷▄▄▄▄▄▄▄   ╷"
-        if self.percent>=80 and self.percent<90:
+        elif self.percent>=80 and self.percent<90:
             bar="╷▄▄▄▄▄▄▄▄  ╷"
-        if self.percent>=90 and self.percent<=100:
+        elif self.percent>=90 and self.percent<=100:
             bar="╷▄▄▄▄▄▄▄▄▄▄╷"
-        if self.percent > 100:
+        elif self.percent > 100:
             bar = BAR_ERROR
         ui.set('Lv', "%d" % self.lv)
         ui.set('Exp', "%s" % bar)
