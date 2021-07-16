@@ -26,7 +26,7 @@ JSON_KEY_EXP_TOT ="exp_tot"
 
 class EXP(plugins.Plugin):
     __author__ = 'GaelicThunder'
-    __version__ = '1.0.4'
+    __version__ = '1.0.5'
     __license__ = 'GPL3'
     __description__ = 'Get exp every time a handshake get captured.'
 
@@ -55,7 +55,12 @@ class EXP(plugins.Plugin):
         if not os.path.exists(self.save_file):
             self.Save(self.save_file, self.save_file_mode)
         else:
-            self.Load(self.save_file, self.save_file_mode)
+            try:
+                #Try loading
+                self.Load(self.save_file, self.save_file_mode)
+            except:
+                #Likely throws an exception if json file is corrupted so we need to calculate from scratch
+                self.calculateInitialXP = True
 
         #no previos data, try get it
         if self.lv == 1 and self.exp == 0:
@@ -104,6 +109,7 @@ class EXP(plugins.Plugin):
                     self.lv == int(line)
                 elif linecounter == 3:
                     self.exp_tot == int(line)
+                linecounter += 1
             outfile.close()
     
     def saveToJsonFile(self,file):
@@ -169,25 +175,25 @@ class EXP(plugins.Plugin):
         bar="╷          ╷"   
         if self.percent<10:
             bar="╷          ╷"
-        if self.percent>=10 and self.percent<20:
+        elif self.percent>=10 and self.percent<20:
             bar="╷▄         ╷"
-        if self.percent>=20 and self.percent<30:
+        elif self.percent>=20 and self.percent<30:
             bar="╷▄▄        ╷"
-        if self.percent>=30 and self.percent<40:
+        elif self.percent>=30 and self.percent<40:
             bar="╷▄▄▄       ╷"
-        if self.percent>=40 and self.percent<50:
+        elif self.percent>=40 and self.percent<50:
             bar="╷▄▄▄▄      ╷"
-        if self.percent>=50 and self.percent<60:
+        elif self.percent>=50 and self.percent<60:
             bar="╷▄▄▄▄▄     ╷"
-        if self.percent>=60 and self.percent<70:
+        elif self.percent>=60 and self.percent<70:
             bar="╷▄▄▄▄▄▄    ╷"
-        if self.percent>=70 and self.percent<80:
+        elif self.percent>=70 and self.percent<80:
             bar="╷▄▄▄▄▄▄▄   ╷"
-        if self.percent>=80 and self.percent<90:
+        elif self.percent>=80 and self.percent<90:
             bar="╷▄▄▄▄▄▄▄▄  ╷"
-        if self.percent>=90 and self.percent<=100:
+        elif self.percent>=90 and self.percent<=100:
             bar="╷▄▄▄▄▄▄▄▄▄▄╷"
-        if self.percent > 100:
+        elif self.percent > 100:
             bar = BAR_ERROR
         ui.set('Lv', "%d" % self.lv)
         ui.set('Exp', "%s" % bar)
