@@ -165,9 +165,9 @@ class EXP(plugins.Plugin):
             os.remove(legacyFile)
     
     def on_ui_setup(self, ui):
-        ui.add_element('Lv', LabeledValue(color=BLACK, label='Lv', value=0, position=(ui.width() / 2 - 125, 95),
+        ui.add_element('Lv', LabeledValue(color=BLACK, label='Lv', value=0, position=(ui.width() / 2 - 125, 81),
                                            label_font=fonts.Bold, text_font=fonts.Medium))
-        ui.add_element('Exp', LabeledValue(color=BLACK, label='Exp', value=0, position=(ui.width() / 2 - 85, 95),
+        ui.add_element('Exp', LabeledValue(color=BLACK, label='Exp', value=0, position=(ui.width() / 2 - 85, 81),
                                            label_font=fonts.Bold, text_font=fonts.Medium))
     def on_ui_update(self, ui):
         self.expneeded=self.calcExpNeeded(self.lv)
