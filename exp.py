@@ -75,8 +75,7 @@ class EXP(plugins.Plugin):
     def on_loaded(self):
         #logging.info("Exp plugin loaded for %s" % self.options['device'])
         self.LogInfo("Plugin Loaded")
-        self.LogInfo(str(self.options["lvl_x_coord"]))
-        
+
     def save_file_modes(self,argument): 
         switcher = { 
             "txt": 0, 
