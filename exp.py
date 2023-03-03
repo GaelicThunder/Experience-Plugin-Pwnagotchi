@@ -163,7 +163,20 @@ class EXP(plugins.Plugin):
             self.LogInfo("Migrating Legacy Save...")
             self.Save(self.save_file, self.save_file_mode)
             os.remove(legacyFile)
-    
+
+    def barString(self, symbols_count, p):
+        if p > 100:
+            return BAR_ERROR
+        length = symbols_count-2
+        bar_char = '▥'
+        blank_char = ' '
+        bar_length = int(round((length / 100)*p))
+        blank_length = length - bar_length
+        res = '|' + bar_char * bar_length + blank_char * blank_length + '|'
+        return res
+
+
+
     def on_ui_setup(self, ui):
         ui.add_element('Lv', LabeledValue(color=BLACK, label='Lv', value=0,
                                           position=(int(self.options["lvl_x_coord"]),
@@ -177,29 +190,8 @@ class EXP(plugins.Plugin):
     def on_ui_update(self, ui):
         self.expneeded=self.calcExpNeeded(self.lv)
         self.percent=int((self.exp/self.expneeded)*100)
-        bar="|          |"
-        if self.percent<10:
-            bar="|          |"
-        elif self.percent>=10 and self.percent<20:
-            bar="|▥         |"
-        elif self.percent>=20 and self.percent<30:
-            bar="|▥▥        |"
-        elif self.percent>=30 and self.percent<40:
-            bar="|▥▥▥       |"
-        elif self.percent>=40 and self.percent<50:
-            bar="|▥▥▥▥      |"
-        elif self.percent>=50 and self.percent<60:
-            bar="|▥▥▥▥▥     |"
-        elif self.percent>=60 and self.percent<70:
-            bar="|▥▥▥▥▥▥    |"
-        elif self.percent>=70 and self.percent<80:
-            bar="|▥▥▥▥▥▥▥   |"
-        elif self.percent>=80 and self.percent<90:
-            bar="|▥▥▥▥▥▥▥▥  |"
-        elif self.percent>=90 and self.percent<=100:
-            bar="|▥▥▥▥▥▥▥▥▥ |"
-        elif self.percent > 100:
-            bar = BAR_ERROR
+        symbols_count=int(self.options["bar_symbols_count"])
+        bar=self.barString(symbols_count, self.percent) 
         ui.set('Lv', "%d" % self.lv)
         ui.set('Exp', "%s" % bar)
 
