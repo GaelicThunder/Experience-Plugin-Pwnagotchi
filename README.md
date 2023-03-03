@@ -18,6 +18,7 @@ Thanks to @mbudget0x01 and @hannadiamond for all the cool stuff!
    main.plugins.exp.lvl_y_coord = 81
    main.plugins.exp.exp_x_coord = 38
    main.plugins.exp.exp_y_coord = 81
+   main.plugins.exp.bar_symbols_count = 12
 ```
 4. Restart your device to see your new plugin!
 
