@@ -1,11 +1,12 @@
 # Experience-Plugin-Pwnagotchi
 
 A totally not useful plugin for the Pwnagotchi, making it get experience everytime he Associates, Deauths or get a Handshake. Try to level him up!
+
 ![EXP Plugin](exp_new.jpg)
 
 Wanted to make him more like a Tamagotchi, but moved that idea on another project.
 
-I'm a total newb when it comes to Python so, feel free to help if you see im doing some bad stuff, or you've got some interesting ideas
+I'm a total newb when it comes to Python so, feel free to help if you see im doing some bad stuff, or you've got some interesting ideas.
 
 Thanks to @mbudget0x01 and @hannadiamond for all the cool stuff!
 
@@ -20,7 +21,7 @@ Thanks to @mbudget0x01 and @hannadiamond for all the cool stuff!
    main.plugins.exp.exp_y_coord = 81
    main.plugins.exp.bar_symbols_count = 12
 ```
-4. Restart your device to see your new plugin!
+3. Restart your device to see your new plugin!
 
 
 ## Things to do
