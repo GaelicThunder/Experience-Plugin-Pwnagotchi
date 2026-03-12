@@ -213,22 +213,19 @@ class EXP(plugins.Plugin):
             self.displayLevelUp(agent)
 
     def parseSessionStats(self):
-        sum = 0
-        dir = pwnagotchi.config['main']['plugins']['session-stats']['save_directory']
-        # TODO: remove
-        self.LogInfo("Session-Stats dir: " + dir)
-        for filename in os.listdir(dir):
-            self.LogInfo("Parsing " + filename + "...")
-            if filename.endswith(".json") & filename.startswith("stats"):
+        total = 0
+        stats_dir = pwnagotchi.config['main']['plugins']['session-stats']['save_directory']
+        self.LogDebug("Session-Stats dir: " + stats_dir)
+        for filename in os.listdir(stats_dir):
+            if filename.endswith(".json") and filename.startswith("stats"):
                 try:
-                    sum += self.parseSessionStatsFile(os.path.join(dir,filename))
-                except:
-                    self.LogInfo("ERROR parsing File: "+ filename)
-                
-        return sum
+                    total += self.parseSessionStatsFile(os.path.join(stats_dir, filename))
+                except Exception:
+                    self.LogInfo("ERROR parsing File: " + filename)
+
+        return total
 
     def parseSessionStatsFile(self, path):
-        sum = 0
         deauths = 0
         handshakes = 0
         associations = 0
@@ -238,39 +235,30 @@ class EXP(plugins.Plugin):
                 deauths += data["data"][entry]["num_deauths"]
                 handshakes += data["data"][entry]["num_handshakes"]
                 associations += data["data"][entry]["num_associations"]
-            
 
-        sum += deauths * MULTIPLIER_DEAUTH
-        sum += handshakes * MULTIPLIER_HANDSHAKE
-        sum += associations * MULTIPLIER_ASSOCIATION
+        total = deauths * MULTIPLIER_DEAUTH
+        total += handshakes * MULTIPLIER_HANDSHAKE
+        total += associations * MULTIPLIER_ASSOCIATION
 
-        return sum
+        return total
 
 
     # If initial sum is 0, we try to parse it
     def calculateInitialSum(self, agent):
-        sessionStatsActive = False
-        sum = 0
+        total = 0
         # Check if session stats is loaded
-        for plugin in pwnagotchi.plugins.loaded:
-            if plugin == "session-stats":
-                sessionStatsActive = True
-                break
-        
-        if sessionStatsActive:
+        if "session-stats" in pwnagotchi.plugins.loaded:
             try:
                 self.LogInfo("parsing session-stats")
-                sum = self.parseSessionStats()
-            except:
+                total = self.parseSessionStats()
+            except Exception:
                 self.LogInfo("Error parsing session-stats")
-            
-            
         else:
             self.LogInfo("parsing last session")
-            sum = self.lastSessionPoints(agent)
+            total = self.lastSessionPoints(agent)
 
-        self.LogInfo(str(sum) + " Points calculated")
-        return sum
+        self.LogInfo(str(total) + " Points calculated")
+        return total
 
 
         
@@ -284,8 +272,8 @@ class EXP(plugins.Plugin):
 
     
     # Helper function to calculate multiple Levels from a sum of EXPs
-    def calcLevelFromSum(self, sum, agent):
-        sum1 = sum
+    def calcLevelFromSum(self, total, agent):
+        sum1 = total
         level = 1
         while sum1 > self.calcExpNeeded(level):
             sum1 -= self.calcExpNeeded(level)
@@ -299,12 +287,12 @@ class EXP(plugins.Plugin):
 
     def calcActualSum(self, level, exp):
         lvlCounter = 1
-        sum = exp
+        total = exp
         # I know it wouldn't work if you change the lvl algorithm
         while lvlCounter < level:
-            sum += self.calcExpNeeded(lvlCounter)
+            total += self.calcExpNeeded(lvlCounter)
             lvlCounter += 1
-        return sum
+        return total
     
     def displayLevelUp(self, agent):
         view =  agent.view()
@@ -340,8 +328,8 @@ class EXP(plugins.Plugin):
     def on_ready(self, agent):
         if self.calculateInitialXP:
             self.LogInfo("Initial point calculation")
-            sum = self.calculateInitialSum(agent)
-            self.exp_tot = sum
-            self.calcLevelFromSum(sum, agent)
+            total = self.calculateInitialSum(agent)
+            self.exp_tot = total
+            self.calcLevelFromSum(total, agent)
             self.Save(self.save_file, self.save_file_mode)
                 
