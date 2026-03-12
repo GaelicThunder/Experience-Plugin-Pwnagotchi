@@ -168,8 +168,8 @@ class EXP(plugins.Plugin):
         if p > 100:
             return BAR_ERROR
         length = symbols_count-2
-        bar_char = '▥'
-        blank_char = ' '
+        bar_char = '█'
+        blank_char = '░'
         bar_length = int(round((length / 100)*p))
         blank_length = length - bar_length
         res = '|' + bar_char * bar_length + blank_char * blank_length + '|'
