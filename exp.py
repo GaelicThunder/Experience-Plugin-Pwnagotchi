@@ -58,7 +58,7 @@ class EXP(plugins.Plugin):
             try:
                 # Try loading
                 self.Load(self.save_file, self.save_file_mode)
-            except:
+            except Exception:
                 # Likely throws an exception if json file is corrupted, so we need to calculate from scratch
                 self.calculateInitialXP = True
 
@@ -106,9 +106,9 @@ class EXP(plugins.Plugin):
                 if linecounter == 1:
                     self.exp = int(line)
                 elif linecounter == 2:
-                    self.lv == int(line)
+                    self.lv = int(line)
                 elif linecounter == 3:
-                    self.exp_tot == int(line)
+                    self.exp_tot = int(line)
                 linecounter += 1
             outfile.close()
     
@@ -222,7 +222,7 @@ class EXP(plugins.Plugin):
             if filename.endswith(".json") & filename.startswith("stats"):
                 try:
                     sum += self.parseSessionStatsFile(os.path.join(dir,filename))
-                except:
+                except Exception:
                     self.LogInfo("ERROR parsing File: "+ filename)
                 
         return sum
@@ -261,7 +261,7 @@ class EXP(plugins.Plugin):
             try:
                 self.LogInfo("parsing session-stats")
                 sum = self.parseSessionStats()
-            except:
+            except Exception:
                 self.LogInfo("Error parsing session-stats")
             
             
