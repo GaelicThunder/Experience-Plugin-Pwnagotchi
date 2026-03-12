@@ -1,6 +1,6 @@
 import logging
 import os
-import random
+
 import json
 
 import pwnagotchi
@@ -91,16 +91,15 @@ class EXP(plugins.Plugin):
             self.saveToJsonFile(file)
 
     def saveToTxtFile(self, file):
-        outfile=open(file, 'w')
-        print(self.exp,file=outfile)
-        print(self.lv,file=outfile)
-        print(self.exp_tot,file=outfile)
-        outfile.close()
+        with open(file, 'w') as outfile:
+            print(self.exp, file=outfile)
+            print(self.lv, file=outfile)
+            print(self.exp_tot, file=outfile)
 
     def loadFromTxtFile(self, file):
         if os.path.exists(file):
-            outfile= open(file, 'r+')
-            lines = outfile.readlines()
+            with open(file, 'r') as outfile:
+                lines = outfile.readlines()
             linecounter = 1
             for line in lines:
                 if linecounter == 1:
@@ -110,7 +109,6 @@ class EXP(plugins.Plugin):
                 elif linecounter == 3:
                     self.exp_tot == int(line)
                 linecounter += 1
-            outfile.close()
     
     def saveToJsonFile(self,file):
         data = {
@@ -179,18 +177,18 @@ class EXP(plugins.Plugin):
 
     def on_ui_setup(self, ui):
         ui.add_element('Lv', LabeledValue(color=BLACK, label='Lv', value=0,
-                                          position=(int(self.options["lvl_x_coord"]),
-                                                    int(self.options["lvl_y_coord"])),
+                                          position=(int(self.options.get("lvl_x_coord", 0)),
+                                                    int(self.options.get("lvl_y_coord", 100))),
                                           label_font=fonts.Bold, text_font=fonts.Medium))
         ui.add_element('Exp', LabeledValue(color=BLACK, label='Exp', value=0,
-                                           position=(int(self.options["exp_x_coord"]),
-                                                     int(self.options["exp_y_coord"])),
+                                           position=(int(self.options.get("exp_x_coord", 38)),
+                                                     int(self.options.get("exp_y_coord", 100))),
                                            label_font=fonts.Bold, text_font=fonts.Medium))
 
     def on_ui_update(self, ui):
         self.expneeded=self.calcExpNeeded(self.lv)
         self.percent=int((self.exp/self.expneeded)*100)
-        symbols_count=int(self.options["bar_symbols_count"])
+        symbols_count=int(self.options.get("bar_symbols_count", 12))
         bar=self.barString(symbols_count, self.percent) 
         ui.set('Lv', "%d" % self.lv)
         ui.set('Exp', "%s" % bar)
